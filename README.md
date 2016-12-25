@@ -9,6 +9,9 @@ Wordpress плагин для обработки текста на&nbsp;осно
 Также позволяет настроить поля для обработки:
 заголовок (post_title), отрывок (post_excerpt) и&nbsp;содержание (post_content) в&nbsp;различных типах записей.
 
+### Скриншот настроек плагина:
+<img src="http://www.igorkiselev.com/assets/jpg/igorkiselev-typograph.jpg" style="width:100%; height:auto" alt="typograph" />
+
 ### Планые на&nbsp;будущее:
 * Страница настроек для параметров типографа;
 * Поддержка языков (сейчас английский и&nbsp;русский);
