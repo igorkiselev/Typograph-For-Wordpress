@@ -27,6 +27,7 @@ add_action('plugins_loaded', function(){
 $slug = 'justbenice-';
 
 add_action('admin_init', function () {
+	global $slug;
 	register_setting( $slug.'typograph-group', $slug.'typograph' );
 	register_setting( $slug.'typograph-group', $slug.'typograph-settings' );
 });
