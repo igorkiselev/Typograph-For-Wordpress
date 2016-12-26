@@ -34,7 +34,7 @@ add_action('admin_init', function () {
 
 if(get_option( $slug.'typograph' )){
 	add_filter('wp_insert_post_data', function ($data, $postarr) {
-		global $typograf;
+		global $typograf, $slug;
 		$settings = get_option( $slug.'typograph-settings' );
 		if($settings){
 			foreach ($settings as $type => $setting ) {
@@ -65,6 +65,7 @@ if(get_option( $slug.'typograph' )){
 add_action('admin_menu', function () {
 	global $slug;
 	add_options_page( __('Typograph', 'jbn-typograph'), __('Typograph', 'jbn-typograph'), 'manage_options', $slug.'typograph-options', function(){
+		global $slug;
 		if (!current_user_can('manage_options')) {
 			wp_die( __('You do not have sufficient permissions to access this page.') );
 		}
@@ -104,10 +105,14 @@ add_action('admin_menu', function () {
 									<?php foreach ( $typograph_fields as $value ) { ?>
 									<td>
 										<?php if($post_type->name == "attachment" && $value == "post_content"){?>
-										<?php }else{?>
+										<?php }else{ ?>
+											
 											<input <?php if(!$hidden){?> disabled<?php } ?>
 												name="<?php echo $slug; ?>typograph-settings[<?php echo $post_type->name; ?>][<?php echo $value; ?>]" type="checkbox" value="1"
-												<?php checked( '1', $typograph_settings[$post_type->name][$value] ); ?> />
+												<?php if(isset($typograph_settings[$post_type->name][$value])) { ?>
+													<?php checked( '1', $typograph_settings[$post_type->name][$value] ); ?>
+												<?php } ?> />
+												
 												<?php if(!$hidden){ ?>
 												<input
 													name="<?php echo $slug; ?>typograph-settings[<?php echo $post_type->name; ?>][<?php echo $value; ?>]"
@@ -152,7 +157,9 @@ add_action('admin_menu', function () {
 												name="<?php echo $slug; ?>typograph-settings[<?php echo $post_type->name; ?>][<?php echo $value; ?>]"
 												type="checkbox"
 												value="1"
-												<?php checked( '1', $typograph_settings[$post_type->name][$value] ); ?> />
+												<?php if(isset($typograph_settings[$post_type->name][$value])) { ?>
+													<?php checked( '1', $typograph_settings[$post_type->name][$value] ); ?>
+												<?php } ?> />
 												<?php if(!$hidden){ ?>
 												<input
 													name="<?php echo $slug; ?>typograph-settings[<?php echo $post_type->name; ?>][<?php echo $value; ?>]"
