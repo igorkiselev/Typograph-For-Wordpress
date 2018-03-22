@@ -30,6 +30,7 @@ add_action('admin_init', function () {
 	global $slug;
 	register_setting( $slug.'typograph-group', $slug.'typograph' );
 	register_setting( $slug.'typograph-group', $slug.'typograph-settings' );
+	register_setting( $slug.'typograph-group', $slug.'typograph-acf' );
 });
 
 if(get_option( $slug.'typograph' )){
@@ -60,6 +61,71 @@ if(get_option( $slug.'typograph' )){
 		$post->post_title = htmlspecialchars_decode(esc_attr( $post->post_title ));
 	} );
 	
+	
+	
+	
+if(get_option( $slug.'typograph-acf' ) && class_exists('acf')){
+
+	add_action('acf/input/admin_footer', function(){
+	?><script type="text/javascript">
+	(function($) {
+		acf.add_action('wysiwyg_tinymce_init', function( ed, id, mceInit, $field ){
+			ed.on('blur', function (e) {
+				var n = ed.getContent({
+					format : 'raw'
+				});
+				var o = ed.startContent;
+				
+				if (n){
+					if (n!=o){
+						var data = {
+							'action': 'typograph',
+							'content': n
+						};
+						
+						$.post(ajaxurl, data, function(r) {
+							r =  (r + '').replace(/\\(.?)/g, function (s, n1) {
+								switch (n1) {
+								case '\\': return '\\'
+								case '0': return '\u0000'
+								case '': return ''
+								default: return n1
+								}
+							});
+							console.log(r);
+							ed.setContent(r,  {format: 'raw'});
+						
+						});
+					}
+				}
+			});
+		});
+	})(jQuery);</script><?php
+});
+	
+	add_action( 'wp_ajax_typograph', function(){
+	
+	global $wpdb;
+	global $typograf;
+
+	$content = $_POST['content'];
+	
+ 	$typograf->set_text($content); 
+	$typograf->setup(array(
+		'Text.paragraphs' => 'off',
+		'Text.breakline' => 'off',
+		'Text.auto_links' => 'off',
+ 		'OptAlign.oa_oquote' => 'off',
+ 		'OptAlign.oa_obracket_coma' => 'off'
+	));
+ 	$content = $typograf->apply();
+	
+	echo $content;
+
+	wp_die();
+
+});
+}	
 }
 
 add_action('admin_menu', function () {
@@ -172,6 +238,15 @@ add_action('admin_menu', function () {
 								</tr>
 								<?php } ?>
 							</table>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php _e('Acf ajax typograph', 'jbn-typograph'); ?></th>
+						<td>
+							<label for="<?php echo $slug; ?>typograph-acf">
+								<input id="<?php echo $slug; ?>typograph-acf" name="<?php echo $slug; ?>typograph-acf" type="checkbox" value="1" <?php checked( '1', get_option($slug.'typograph-acf') ); ?> />
+								<?php _e('Processes content with typographic rules on blur of acf wysiwyg.', 'jbn-typograph'); ?>
+							</label>
 						</td>
 					</tr>
 				</table>
